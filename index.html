@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17325c">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Pradeep Sales POS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="logo-chip"><img id="brand-logo" src="logo.png" alt="Logo"></div>
+    <div class="brand">
+      <div id="brand-name">PRADEEP SALES</div>
+      <div id="view-title">New Sale</div>
+    </div>
+    <div class="top-gfx" id="top-gfx" aria-hidden="true"></div>
+    <div class="clock" id="clock"></div>
+  </header>
+
+  <nav class="nav">
+    <button data-act="nav" data-view="sale" class="active"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg><span>New Sale</span></button>
+    <button data-act="nav" data-view="products"><svg viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg><span>Products</span></button>
+    <button data-act="nav" data-view="customers"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.2-5.5 6.5-5.5s5.9 2 6.5 5.5"/><path d="M16 4.8a3.5 3.5 0 010 6.4M18 14.8c2 .8 3.2 2.6 3.5 5.2"/></svg><span>Customers</span></button>
+    <button data-act="nav" data-view="history"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span>History</span></button>
+    <button data-act="nav" data-view="analytics"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg><span>Analytics</span></button>
+    <button data-act="nav" data-view="settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Settings</span></button>
+  </nav>
+
+  <main>
+    <!-- ================= NEW SALE ================= -->
+    <section id="v-sale" class="view sale">
+      <div class="pane products-pane">
+        <div class="toolbar">
+          <input id="p-search" type="search" placeholder="Search product or brand…" autocomplete="off">
+          <button class="btn" data-act="product-new">+ Product</button>
+        </div>
+        <div id="p-grid" class="tiles"></div>
+      </div>
+
+      <div class="pane bill-pane">
+        <div class="cust">
+          <input id="c-mobile" inputmode="numeric" maxlength="10" placeholder="Mobile" autocomplete="off">
+          <input id="c-name" placeholder="Party name (blank = walk-in)" autocomplete="off">
+          <button class="icon-btn" data-act="cust-clear" title="Clear customer">×</button>
+          <div id="c-suggest" class="suggest" hidden></div>
+        </div>
+        <div class="bill-scroll" id="bill-scroll">
+          <table class="bill">
+            <thead><tr><th class="c">S.No.</th><th>Item Name</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th><th></th></tr></thead>
+            <tbody id="cart-body"></tbody>
+          </table>
+          <div id="cart-empty" class="empty">Tap a product to add it to the bill</div>
+        </div>
+        <div class="bill-foot">
+          <div class="ly-strip" id="ly-strip" hidden>
+            <span class="star">★</span><span id="ly-bal"></span>
+            <label>Redeem<input id="ly-redeem" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+            <button class="btn sm" data-act="ly-max">Max</button>
+            <span id="ly-earn"></span>
+          </div>
+          <div class="total-box">
+            <div><span class="lbl">TOTAL</span><span id="cart-meta" class="meta"></span><span id="cart-sub" class="meta"></span></div>
+            <strong id="cart-total">₹0</strong>
+          </div>
+          <div class="foot-btns">
+            <button class="btn ghost" data-act="cart-clear">Clear</button>
+            <button class="btn primary big" id="save-print" data-act="save-print">SAVE &amp; PRINT</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRODUCTS ================= -->
+    <section id="v-products" class="view page" hidden>
+      <div class="toolbar">
+        <input id="pm-search" type="search" placeholder="Search products…" autocomplete="off">
+        <label class="btn ghost">Import CSV<input type="file" id="import-file" accept=".csv,text/csv" hidden></label>
+        <button class="btn primary" data-act="product-new">+ Add Product</button>
+      </div>
+      <div class="note" id="pm-note"></div>
+      <div class="table-wrap">
+        <table class="grid">
+          <thead><tr><th style="width:64px">Photo</th><th>Item Name</th><th>Brand</th><th class="r">Selling Price</th><th class="r ly-cell">Points / Unit</th><th class="r" style="width:190px"></th></tr></thead>
+          <tbody id="pm-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= CUSTOMERS ================= -->
+    <section id="v-customers" class="view page" hidden>
+      <div class="toolbar">
+        <input id="cm-search" type="search" placeholder="Search by name or mobile…" autocomplete="off">
+        <button class="btn primary" data-act="customer-new">+ Add Customer</button>
+      </div>
+      <div class="note" id="cm-note"></div>
+      <div class="table-wrap">
+        <table class="grid">
+          <thead><tr><th>Party</th><th>Mobile</th><th class="r">Bills</th><th class="r">Total Purchase</th><th>Last Purchase</th><th class="r ly-cell">Points</th><th class="r"></th></tr></thead>
+          <tbody id="cm-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= SALES HISTORY ================= -->
+    <section id="v-history" class="view page" hidden>
+      <div class="toolbar">
+        <input id="h-q" type="search" placeholder="Invoice no, customer or mobile…" autocomplete="off">
+        <label class="date">From<input type="date" id="h-from"></label>
+        <label class="date">To<input type="date" id="h-to"></label>
+        <button class="btn ghost" data-act="h-reset">Reset</button>
+        <button class="btn" data-act="h-export">Export CSV</button>
+      </div>
+      <div class="note" id="h-note"></div>
+      <div class="table-wrap">
+        <table class="grid">
+          <thead><tr><th>Invoice No.</th><th>Date</th><th>Party</th><th>Mobile</th><th class="r ly-cell">Points +/−</th><th class="r">Total Amount</th><th class="r" style="width:190px"></th></tr></thead>
+          <tbody id="h-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= ANALYTICS ================= -->
+    <section id="v-analytics" class="view page" hidden>
+      <div class="cards" id="a-fixed"></div>
+
+      <div class="toolbar">
+        <div class="seg">
+          <button data-act="a-preset" data-p="today">Today</button>
+          <button data-act="a-preset" data-p="7">7 Days</button>
+          <button data-act="a-preset" data-p="month">This Month</button>
+          <button data-act="a-preset" data-p="all">All</button>
+        </div>
+        <label class="date">From<input type="date" id="a-from"></label>
+        <label class="date">To<input type="date" id="a-to"></label>
+      </div>
+
+      <div class="cards" id="a-cards"></div>
+
+      <div class="panel">
+        <h3>Daily Sales</h3>
+        <div id="a-daily" class="daily"></div>
+      </div>
+
+      <div class="panels">
+        <div class="panel">
+          <div class="panel-head"><h3>Most Sold Products</h3><button class="btn sm ghost" data-act="a-export" data-k="prod">CSV</button></div>
+          <div class="table-wrap short"><table class="grid compact"><thead><tr><th>Product</th><th>Brand</th><th class="r">Qty Sold</th><th class="r">Revenue</th></tr></thead><tbody id="a-products"></tbody></table></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Brand-wise Sales</h3><button class="btn sm ghost" data-act="a-export" data-k="brand">CSV</button></div>
+          <div id="a-brands" class="bars"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Top Customers</h3><button class="btn sm ghost" data-act="a-export" data-k="cust">CSV</button></div>
+        <div class="table-wrap short"><table class="grid compact"><thead><tr><th>Party</th><th>Mobile</th><th class="r">Bills</th><th class="r">Total Sales</th><th>Last Purchase</th><th class="r"></th></tr></thead><tbody id="a-customers"></tbody></table></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Detailed Sales Report</h3>
+          <input id="a-q" type="search" placeholder="Filter item, brand or customer…" autocomplete="off">
+          <button class="btn sm" data-act="a-export" data-k="report">Export CSV</button>
+        </div>
+        <div class="note" id="a-report-note"></div>
+        <div class="table-wrap tall"><table class="grid compact"><thead><tr><th>Date</th><th>Invoice</th><th>Sold To</th><th>Mobile</th><th>Item</th><th>Brand</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody id="a-report"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section id="v-settings" class="view page" hidden>
+      <div class="panels">
+        <div class="panel">
+          <h3>Shop &amp; Receipt</h3>
+          <div class="form">
+            <label>Shop name (header and receipt)<input data-set="shopName" maxlength="40"></label>
+            <label>Address line (optional, printed on receipt)<input data-set="address" maxlength="80"></label>
+            <label>Phone (optional, printed on receipt)<input data-set="phone" maxlength="30"></label>
+            <label>Receipt footer message<input data-set="footer" maxlength="40"></label>
+            <label>Invoice number prefix<input data-set="prefix" maxlength="6"></label>
+            <label>Copies to print on Save &amp; Print
+              <select data-set="copies">
+                <option value="ask">Ask every time</option>
+                <option value="customer">Customer Copy only</option>
+                <option value="sales">Sales Copy only</option>
+                <option value="both">Both copies</option>
+              </select></label>
+            <label class="chk"><input type="checkbox" data-set="gfx"> Print spare-part graphics in the receipt header</label>
+          </div>
+          <div class="logo-row">
+            <div id="s-logo-prev" class="photo-prev"></div>
+            <div>
+              <label class="btn">Replace Logo<input type="file" id="logo-file" accept="image/*" hidden></label>
+              <button class="btn ghost" data-act="logo-remove">Use Built-in Logo</button>
+              <p class="hint">The Pradeep Sales logo is built in. It prints small, in black &amp; white, on receipts.</p>
+            </div>
+          </div>
+          <button class="btn" data-act="test-print">Print Test Receipt</button>
+        </div>
+
+        <div class="panel">
+          <h3>Loyalty Points</h3>
+          <div class="form">
+            <label class="chk big"><input type="checkbox" data-set="loyaltyOn"> Enable loyalty mode</label>
+          </div>
+          <p class="hint">When off, nothing about points appears anywhere in billing, receipts or reports. Points already given are kept and come back when you switch it on again.</p>
+          <div id="ly-config">
+            <div class="form">
+              <label class="chk"><input type="checkbox" data-set="lyItem"> Item points: earn the “points per unit” set on each product</label>
+              <div class="row2">
+                <label>Bill points: give this many points<input data-set="lyBillPts" inputmode="decimal"></label>
+                <label>for every ₹ of bill value<input data-set="lyBillPer" inputmode="decimal"></label>
+              </div>
+              <label class="chk"><input type="checkbox" data-set="lyRedeem"> Allow customers to redeem points on a bill</label>
+              <div class="row2">
+                <label>Value of 1 point (₹)<input data-set="lyValue" inputmode="decimal"></label>
+                <label>Minimum balance needed to redeem<input data-set="lyMin" inputmode="numeric"></label>
+              </div>
+            </div>
+            <p class="hint">Party settings (enrolled or not, points multiplier, manual adjustment) are in Customers → Edit / Points. Points need a 10-digit mobile number on the bill.</p>
+            <button class="btn ghost" data-act="csv" data-k="loyalty">Points Ledger CSV</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Backup, Restore &amp; Exports</h3>
+          <p class="hint">All data is stored on this tablet only. Take a backup regularly and keep the file somewhere safe (Google Drive, WhatsApp to yourself, email).</p>
+          <div class="btn-col">
+            <button class="btn primary" data-act="backup">Download JSON Backup</button>
+            <label class="btn">Restore From Backup<input type="file" id="restore-file" accept=".json,application/json" hidden></label>
+            <button class="btn ghost" data-act="csv" data-k="products">Products CSV</button>
+            <button class="btn ghost" data-act="csv" data-k="customers">Customers CSV</button>
+            <button class="btn ghost" data-act="csv" data-k="sales">Sales (Invoices) CSV</button>
+            <button class="btn ghost" data-act="csv" data-k="invoiceItems">Invoice Items CSV</button>
+          </div>
+          <div id="s-db" class="hint" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="confirm-root"></div>
+<div id="toast"></div>
+<div id="print-area" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
